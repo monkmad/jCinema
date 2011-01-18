@@ -19,6 +19,6 @@ $.extend(jCinema.options, {
 	// the first one that matches will be used.
 	FolderImagePathPattern:     '{path}/{name}.jpg;{path}/folder.jpg',
 	ThumbnailImagePathPattern:  '{dir}/_MovieSheets/{name}/thumb.jpg;{dir}/{name}.jpg;{dir}/folder.jpg',
-	MovieSheetImagePathPattern: '{dir}/_MovieSheets/{name}/sheet.jpg;{dir}/{name}{suffix}_sheet.jpg;{dir}/wd_tv.jpg',
-	PatternSeparator:           ';',
+	MovieSheetImagePathPattern: '{dir}/_MovieSheets/{name}/sheet.jpg;{dir}/{name}{suffix}_sheet.sheet.jpg;{dir}/{name}{suffix}_sheet.wall.jpg;{dir}/{name}{suffix}_sheet.jpg;{dir}/wd_tv.jpg',
+	PatternSeparator: 	    ';',
 });
