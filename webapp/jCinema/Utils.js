@@ -16,7 +16,7 @@
 
 jCinema.Utils = function () {
 	
-	var timeCodeRegex = /^(\d\d)\:(\d\d)(?:\:(\d\d))?/i
+	var timeCodeRegex = /^(\d\d)\:(\d\d)(?:\:(\d\d))?/i;
 	
 	var convertTimeCodeToSeconds = function (timeCode) {
 		var match = timeCodeRegex.exec(timeCode);
@@ -57,14 +57,6 @@ jCinema.Utils = function () {
 		return timeCode;
 	};
 	
-	var reloadPageAndCss = function () {
-		$('link[rel="stylesheet"][href]').each(function (index, elem) {
-			var h = elem.href.replace(/(&|\?)forceReload=\d+/, '');
-			elem.href = h + (h.indexOf('?') >= 0 ? '&' : '?') + 'forceReload=' + (new Date().valueOf());
-		});
-		location.reload(true);
-	};
-	
 	var callBackEnd = function (method, params, success, error) {
 		var opts = {
 			async: false,
@@ -76,7 +68,7 @@ jCinema.Utils = function () {
 			data: JSON.stringify({
 				version: '1.1',
 				method: method,
-				params: params || [],
+				params: params || []
 			}),
 			success: function (result) { if (success) success(result.result); },
 			error: error
@@ -93,11 +85,77 @@ jCinema.Utils = function () {
 		return null;
 	};
 	
+	var loadUrl = function (url) {
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', url, false);
+		xhr.send();
+		return xhr.responseText;
+	};
+	
+	// this function dynamically loads the given js file
+	var includeJS = function (file) {
+		jCinema.debug('loading JS ' + file);
+		eval(loadUrl(file));
+	};
+	
+	// this function dynamically loads the given css file
+	var includeCSS = function (file, onComplete) {
+		jCinema.debug('loading CSS ' + file);
+		// This is somewhat tricky:
+		// We need to call onComplete only when the CSS has been loaded. we could
+		// achieve that by loading the file and injecting it into "head". but then
+		// relative url()'s in the css will fail.
+		// by putting a <link> into "head" such url()'s work fine, but we never
+		// know when the CSS is loaded.
+		// So as a solution we now load the css, to make sure it's in the cache,
+		// and then add the <link> tag and call our completion handler after a short
+		// wait period.
+		// We choose a dynamic filename, to ensure browsers always reload modified
+		// CSS files during development.
+		var dynamicName = file+'?'+(new Date().valueOf());
+		$.get(dynamicName, function (data, textStatus, XMLHttpRequest) {
+			if (data.length > 0) {
+				$('head').append('<link type="text/css" rel="stylesheet" href="' + dynamicName + '" />');
+				setTimeout(onComplete, 250);
+			} else {
+				onComplete();
+			}
+		});
+	};
+	
+	var reloadPageAndCss = function () {
+		$('link[rel="stylesheet"][href]').each(function (index, elem) {
+			var h = elem.href.replace(/(&|\?)forceReload=\d+/, '');
+			elem.href = h + (h.indexOf('?') >= 0 ? '&' : '?') + 'forceReload=' + (new Date().valueOf());
+		});
+		location.reload(true);
+	};
+	
+	var getStyledImageUrl = function (imageName) {
+		return 'jCinema/styles/' + jCinema.options.Style + '/images/' + imageName;
+	};
+	
+	// JSON does not support comments, but we'd like to have them anyway, please
+	var jsLineCommentRegex = /^\s*\/\/.*$/gm;
+	var jsBlockCommentRegex = /\/\*(?:.|\n)*\*\//gm;
+	var removeJSONComments = function (json) {
+		json = json.replace(jsBlockCommentRegex, '');
+		json = json.replace(jsLineCommentRegex, '');
+		return json;
+	};
+	
 	return {
 		convertTimeCodeToSeconds: convertTimeCodeToSeconds,
 		convertSecondsToTimeCode: convertSecondsToTimeCode,
+		callBackEnd: callBackEnd,
+		
+		loadUrl: loadUrl,
+		includeJS: includeJS,
+		includeCSS: includeCSS,
 		reloadPageAndCss: reloadPageAndCss,
-		callBackEnd: callBackEnd
+		getStyledImageUrl: getStyledImageUrl,
+		
+		removeJSONComments: removeJSONComments,
 	};
 	
 }();

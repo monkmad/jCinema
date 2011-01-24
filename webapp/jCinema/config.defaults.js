@@ -1,4 +1,10 @@
 $.extend(jCinema.options, {
+	// The default locale used by the UI
+	Locale: 'en',
+	
+	// The current UI style
+	Style: 'default',
+	
 	// Currently allowed values are WDTV and Desktop.
 	Platform:		(navigator.userAgent.indexOf('QtEmbedded') != -1) ? 'WDTV' : 'Desktop',
 	
@@ -20,5 +26,5 @@ $.extend(jCinema.options, {
 	FolderImagePathPattern:     '{path}/{name}.jpg;{path}/folder.jpg',
 	ThumbnailImagePathPattern:  '{dir}/_MovieSheets/{name}/thumb.jpg;{dir}/{name}.jpg;{dir}/folder.jpg',
 	MovieSheetImagePathPattern: '{dir}/_MovieSheets/{name}/sheet.jpg;{dir}/{name}{suffix}_sheet.sheet.jpg;{dir}/{name}{suffix}_sheet.wall.jpg;{dir}/{name}{suffix}_sheet.jpg;{dir}/wd_tv.jpg',
-	PatternSeparator: 	    ';',
+	PatternSeparator: 	    ';'
 });

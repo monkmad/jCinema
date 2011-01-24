@@ -49,9 +49,16 @@ jCinema.ViewStack = function () {
 	// load a view's contoller and stylesheet
 	function prepareView(viewName, onComplete) {
 		var baseUrl = 'jCinema/views/' + viewName + '/';
-		jCinema.includeCSS(baseUrl + 'view.css', function () {
-			jCinema.includeJS(baseUrl + 'controller.js');
-			onComplete();
+		jCinema.Utils.includeCSS(baseUrl + 'view.css', function () {
+			// try to load a custom css from the styles directory
+			jCinema.Utils.includeCSS('jCinema/styles/' + jCinema.options.Style + '/' + viewName + '.css', function () {
+				jCinema.Utils.includeJS(baseUrl + 'controller.js');
+				
+				// load the localization dict as well
+				jCinema.Localization.loadDictionary(baseUrl + 'locale');
+				
+				onComplete();
+			});
 		});
 	};
 	
@@ -122,7 +129,7 @@ jCinema.ViewStack = function () {
 		pushView: pushView,
 		popView:  popView,
 		
-		waitIndicator: waitIndicator,
+		waitIndicator: waitIndicator
 	};
 	
 }();
